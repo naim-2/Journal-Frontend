@@ -5,12 +5,14 @@ interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+  isAuthenticated: boolean;
 }
 
 const initialState: AuthState = {
   token: null,
   loading: false,
   error: null,
+  isAuthenticated: false,
 };
 
 export const login = createAsyncThunk('auth/login', async (credentials: { email: string; password: string }) => {
@@ -34,6 +36,7 @@ export const authSlice = createSlice({
     builder.addCase(login.fulfilled, (state, action) => {
       state.token = action.payload;
       state.loading = false;
+      state.isAuthenticated = true;
     });
     builder.addCase(login.rejected, (state, action) => {
       state.loading = false;

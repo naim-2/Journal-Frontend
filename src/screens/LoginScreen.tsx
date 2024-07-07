@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Dimensions } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../store/authSlice';
@@ -8,7 +8,13 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch: AppDispatch = useDispatch();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigation.navigate('Journal'); 
+    }
+  }, [isAuthenticated, navigation]);
 
   const handleLogin = () => {
     dispatch(login({ email, password }));
