@@ -8,9 +8,14 @@ const NewEntryScreen = ({ navigation }: { navigation: any }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('personal');
+  const [error, setError] = useState<any>(null);
   const dispatch = useDispatch();
 
   const handleAddEntry = () => {
+    if (!title || !content) {
+      setError('Title and content cannot be blank.');
+      return;
+    }
     const date = new Date().toISOString().split('T')[0];
     dispatch(addEntry({ title, content, category, date }));
     navigation.goBack();
@@ -45,6 +50,7 @@ const NewEntryScreen = ({ navigation }: { navigation: any }) => {
         onChangeText={setContent}
         style={styles.input}
       />
+      {error && <Text style={styles.error}>{error}</Text>}
       <Button title="Add Entry" onPress={handleAddEntry} />
     </View>
   );
@@ -74,6 +80,10 @@ const styles = StyleSheet.create({
   picker: {
     height: 40,
     width: '100%',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 20,
   },
 });
 

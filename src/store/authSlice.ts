@@ -40,7 +40,7 @@ export const authSlice = createSlice({
     });
     builder.addCase(login.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.error.message || 'Failed to login';
+      state.error = 'Failed to login. Wrong username or password.';
     });
   },
 });

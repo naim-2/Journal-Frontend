@@ -14,8 +14,13 @@ const EditEntryScreen = ({ route, navigation }: { route: any, navigation: any })
   const [content, setContent] = useState(entry?.content || '');
   const [category, setCategory] = useState(entry?.category || '');
   const [date, setDate] = useState(entry?.date || '');
+  const [error, setError] = useState<any>(null);
 
   const handleUpdateEntry = () => {
+    if (!title || !content) {
+      setError('Title and content cannot be blank.');
+      return;
+    }
     dispatch(updateEntry({ id, title, content, category, date }));
     navigation.goBack();
   };
@@ -49,6 +54,7 @@ const EditEntryScreen = ({ route, navigation }: { route: any, navigation: any })
         onChangeText={setContent}
         style={styles.input}
       />
+      {error && <Text style={styles.error}>{error}</Text>}
       <Button title="Update Entry" onPress={handleUpdateEntry} />
     </View>
   );
@@ -76,6 +82,10 @@ const styles = StyleSheet.create({
   picker: {
     height: 40,
     width: '100%',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 20,
   },
 });
 

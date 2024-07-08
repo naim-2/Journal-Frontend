@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Text, Button, StyleSheet } from 'react-native';
+import { View, FlatList, Text, Button, StyleSheet, Modal, TextInput, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useDispatch, useSelector } from 'react-redux';
-import { getEntries, deleteEntry } from '../store/journalSlice';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { getEntries, deleteEntry, updateUser } from '../store/journalSlice';
 import { RootState, AppDispatch  } from '../store';
 import moment from 'moment';
 
@@ -10,6 +11,11 @@ const JournalScreen = ({ navigation }: { navigation: any }) => {
   const dispatch: AppDispatch  = useDispatch();
   const { entries, loading, error } = useSelector((state: RootState) => state.journal);
   const [categoryFilter, setCategoryFilter] = useState('All');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
+
 
   if (!entries) {
     return (
@@ -23,8 +29,25 @@ const JournalScreen = ({ navigation }: { navigation: any }) => {
     dispatch(getEntries());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (modalVisible) {
+      setUsername('');
+      setPassword('');
+      setValidationError(null);
+    }
+  }, [modalVisible]);
+  
   const handleDelete = (id: number) => {
     dispatch(deleteEntry(id));
+  };
+
+  const handleUpdateUser = () => {
+    if(!username || !password){
+      setValidationError('Username and password cannot be blank.');
+      return;
+    }
+    dispatch(updateUser({ username, password }));
+    setModalVisible(false);
   };
 
   const filteredEntries = categoryFilter === 'All'
@@ -51,9 +74,12 @@ const JournalScreen = ({ navigation }: { navigation: any }) => {
         <Picker.Item label="Work" value="work" />
         <Picker.Item label="Travel" value="travel" />
       </Picker>
-      <View style={styles.stats}>
+      <View style={styles.stats_user}>
         <Text>Today: {entriesToday}</Text>
         <Text>Total: {totalEntries}</Text>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <Icon name="user" size={30} color="black" />
+        </TouchableOpacity>
       </View>
       <FlatList
         data={filteredEntries}
@@ -72,6 +98,35 @@ const JournalScreen = ({ navigation }: { navigation: any }) => {
         )}
       />
       <Button title="Add New Entry" onPress={() => navigation.navigate('NewEntry')} />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>Update User Information</Text>
+          <TextInput
+            placeholder="New Username"
+            value={username}
+            onChangeText={setUsername}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="New Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+          />
+          {validationError && <Text style={styles.error}>{validationError}</Text>}
+          <View style={styles.buttonContainer}>
+            <Button title="Update" color="green" onPress={handleUpdateUser} />
+            <View style={{ width: 10 }} />
+            <Button title="Cancel" color="red" onPress={() => setModalVisible(false)} />
+          </View>  
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -100,15 +155,45 @@ const styles = StyleSheet.create({
     width: 200,
     marginBottom: 20,
   },
-  stats: {
+  stats_user: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: 150,
+    width: '99%',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
+  },
+  modalView: {
+    margin: 20,
+    marginTop: '50%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 10,
+    width: '100%',
   },
 });
 

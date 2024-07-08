@@ -53,6 +53,14 @@ export const deleteEntry = createAsyncThunk('journal/deleteEntry', async (id: nu
   return id;
 });
 
+export const updateUser = createAsyncThunk('journal/updateUser', async (userData: { username: string, password: string }, {getState}) => {
+  const state = getState() as any;
+  await api.put(`/user`, userData, {
+    headers: { Authorization: `Bearer ${state.auth.token}` },
+  });
+  return userData;
+});
+
 export const journalSlice = createSlice({
   name: 'journal',
   initialState,
@@ -69,15 +77,6 @@ export const journalSlice = createSlice({
     builder.addCase(getEntries.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || 'Failed to fetch entries';
-    });
-    builder.addCase(getEntryById.fulfilled, (state, action) => {
-      const entry = action.payload;
-      const existingEntry = state.entries.find(e => e.id === entry.id);
-      if (existingEntry) {
-        Object.assign(existingEntry, entry);
-      } else {
-        state.entries.push(entry);
-      }
     });
     builder.addCase(addEntry.fulfilled, (state, action) => {
       state.entries.push(action.payload);
