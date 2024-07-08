@@ -20,3 +20,6 @@ their entries within the application. You can choose to run the backend together
 ### 3. Connecting the local backend to the frontend
 * If you choose to use your own deployed backend instead of the hosted one, hover to src/api/index.ts file and change the variable in line 5 from 'PRODUCTION_URL' to 'LOCAL_URL'.
 * Make sure the backend is running on port 3000.
+
+## Demo
+https://github.com/naim-2/Journal-Frontend/assets/121217709/21d57f27-74a7-4ce7-9e68-29fe4930631e
